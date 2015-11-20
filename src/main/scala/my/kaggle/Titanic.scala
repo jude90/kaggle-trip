@@ -77,7 +77,7 @@ object Titanic {
         }
 
         LabeledPoint(survived.asInstanceOf[Int].toDouble,
-          Vectors.dense(Array(pclass,sex_cl ,age, sibsp, parch,fare))
+          Vectors.dense(Array(pclass,sex_cl ,fare))
           )
 
       }
@@ -101,7 +101,7 @@ object Titanic {
             case "C" => 3
             case _ => 0
           }
-        (pid, Vectors.dense(Array(pclass,sex_cl ,age, sibsp, parch,fare)))
+        (pid, Vectors.dense(Array(pclass,sex_cl ,fare)))
 
       }
       // Train a DecisionTree model.
@@ -129,7 +129,10 @@ object Titanic {
       val testpredicts = testfeature.map{ case(pid,feature) =>
         (pid, treemodel.predict(feature).toInt)
       }
-      testpredicts.coalesce(1).saveAsTextFile("predicts.csv")
+
+      testpredicts.coalesce(1).map{case (id, p)=>
+      Array(id,p).mkString(",")
+      }.saveAsTextFile("predicts.csv")
 //      testpredicts.foreach(print)
       println("Learned classification tree model:\n" + treemodel.toDebugString)
 
